@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 
 const aiProjects = [
   { id:"04", status:"SHIPPED", category:"LOCAL AI", title:"Smart Resume Screener", kind:"LOCAL AI · RESPONSIBLE ML", description:"A privacy-first screening workspace that compares resumes with a job description, then surfaces ranked evidence and gaps for human review. Local Ollama inference adds structured fit analysis alongside an explainable deterministic score.", stack:["Ollama","Gemma 3","PDF.js","Node.js","SQLite","Structured output"], link:"https://github.com/arunkuttiyadan/Smart-resume-screener", note:"Resume text stays local by default. No cloud API or account required." },
@@ -27,6 +28,23 @@ const commands = [
 
 const normalizeSearch = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
+type ChatMessage = { role:"assistant" | "user"; text:string };
+
+const starterQuestions = ["What does Arun build?", "Show me his AI skills", "How can I contact him?"];
+
+function portfolioAnswer(question: string){
+  const query = normalizeSearch(question);
+  if (/contact|email|hire|reach|available/.test(query)) return "Arun is available for AI engineering and full-stack opportunities. You can reach him at arunkuttiyadan@gmail.com or use the contact section below.";
+  if (/resume|cv|download/.test(query)) return "You can download Arun's résumé from the button in the hero section. It includes his education, technical skills and project experience.";
+  if (/cgpa|education|college|university|degree|study/.test(query)) return "Arun is pursuing a B.Tech in Computer Science and Engineering with an AI specialization at VIT-AP University (2023–2027). His current CGPA is 8.01/10.";
+  if (/resume screener|screening|ollama|local ai/.test(query)) return "The Smart Resume Screener is Arun's privacy-first local AI project. It uses Ollama and Gemma 3 to compare résumés with job descriptions while keeping documents local by default.";
+  if (/project|build|work|portfolio/.test(query)) return "Arun builds applied AI systems, including a local Smart Resume Screener, an AI Code Assistant, a RAG-based document intelligence tool and DURGA SafeConnect.";
+  if (/full.?stack|backend|frontend|web|mobile/.test(query)) return "His engineering stack includes Python, FastAPI, React, Node.js, Express, MongoDB, SQLite, Flutter, Dart, Kotlin and Android services.";
+  if (/skill|ai|machine learning|llm|rag|langchain|vector/.test(query)) return "Arun focuses on LLM applications, RAG, semantic search and responsible AI. He works with LangChain, Hugging Face, Ollama, FAISS, ChromaDB, TensorFlow, PyTorch and scikit-learn.";
+  if (/hello|hi|hey|who/.test(query)) return "Hi! I'm Arun's portfolio guide. Ask me about his AI work, engineering skills, education, résumé or availability.";
+  return "I can help with Arun's AI projects, technical skills, education, résumé and contact details. Try asking what he builds or which tools he works with.";
+}
+
 function Arrow(){ return <span aria-hidden="true">↗</span>; }
 
 export default function Home(){
@@ -35,7 +53,13 @@ export default function Home(){
   const [commandQuery, setCommandQuery] = useState("");
   const [time, setTime] = useState("--:--:--");
   const [progress, setProgress] = useState(0);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [chatThinking, setChatThinking] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{ role:"assistant", text:"Hi, I'm Arun's portfolio guide. Ask me about his AI work, technical stack or availability." }]);
   const heroRef = useRef<HTMLElement>(null);
+  const companionRef = useRef<HTMLDivElement>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const visibleProjects = useMemo(() => projectFilter === "ALL" ? aiProjects : aiProjects.filter(project => project.category === projectFilter), [projectFilter]);
   const visibleCommands = useMemo(() => commands.filter(command => normalizeSearch(`${command.label} ${command.hint}`).includes(normalizeSearch(commandQuery))), [commandQuery]);
@@ -55,8 +79,15 @@ export default function Home(){
       const height = document.documentElement.scrollHeight - window.innerHeight;
       setProgress(height > 0 ? (window.scrollY / height) * 100 : 0);
     };
+    const onPointerMove = (event: PointerEvent) => {
+      const x = (event.clientX / window.innerWidth - .5) * 10;
+      const y = (event.clientY / window.innerHeight - .5) * -8;
+      companionRef.current?.style.setProperty("--robot-x", `${x}deg`);
+      companionRef.current?.style.setProperty("--robot-y", `${y}deg`);
+    };
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("scroll", onScroll, { passive:true });
+    window.addEventListener("pointermove", onPointerMove, { passive:true });
     onScroll();
     const observer = new IntersectionObserver(entries => entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -69,9 +100,12 @@ export default function Home(){
       window.clearInterval(timer);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointermove", onPointerMove);
       observer.disconnect();
     };
   }, []);
+
+  useEffect(() => { if (chatOpen) chatEndRef.current?.scrollIntoView({ behavior:"smooth" }); }, [chatMessages, chatOpen, chatThinking]);
 
   const onHeroMove = (event: React.MouseEvent<HTMLElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect();
@@ -85,6 +119,19 @@ export default function Home(){
     if (href.startsWith("#")) document.querySelector(href)?.scrollIntoView({ behavior:"smooth" });
     else if (href.startsWith("http")) window.open(href, "_blank", "noopener,noreferrer");
     else window.location.assign(href);
+  };
+
+  const askPortfolio = (question: string) => {
+    const cleanQuestion = question.trim();
+    if (!cleanQuestion || chatThinking) return;
+    setChatOpen(true);
+    setChatInput("");
+    setChatMessages(messages => [...messages, { role:"user", text:cleanQuestion }]);
+    setChatThinking(true);
+    window.setTimeout(() => {
+      setChatMessages(messages => [...messages, { role:"assistant", text:portfolioAnswer(cleanQuestion) }]);
+      setChatThinking(false);
+    }, 650);
   };
 
   return <>
@@ -129,6 +176,16 @@ export default function Home(){
       <section className="contact" data-reveal><p className="label">04 / START A CONVERSATION</p><h2>Have an AI problem<br/>worth solving?</h2><a className="mail" href="mailto:arunkuttiyadan@gmail.com">arunkuttiyadan@gmail.com <Arrow/></a><div><a href="tel:+918086062055">+91 80860 62055</a><a href="https://www.linkedin.com/in/arun-kuttiyadan/" target="_blank" rel="noreferrer">LINKEDIN <Arrow/></a><a href="https://github.com/arunkuttiyadan" target="_blank" rel="noreferrer">GITHUB <Arrow/></a></div></section>
     </main>
     <footer><p>ARUN K / AI LAB</p><p>DESIGNED & ENGINEERED WITH INTENT</p><p>© 2026</p></footer>
+    <div className={`ai-companion ${chatOpen ? "is-open" : ""}`} ref={companionRef}>
+      {!chatOpen && <span className="companion-callout">ASK ARUN.AI <i>●</i></span>}
+      {chatOpen && <section className="chat-panel" aria-label="Arun portfolio assistant">
+        <div className="chat-head"><div><span><i/> ARUN.AI</span><small>PORTFOLIO GUIDE · ONLINE</small></div><button type="button" onClick={() => setChatOpen(false)} aria-label="Close chat">×</button></div>
+        <div className="chat-messages" aria-live="polite">{chatMessages.map((message,index) => <p className={message.role} key={`${message.role}-${index}`}><span>{message.role === "assistant" ? "AK" : "YOU"}</span>{message.text}</p>)}{chatThinking && <p className="assistant typing"><span>AK</span><i/><i/><i/></p>}<div ref={chatEndRef}/></div>
+        {chatMessages.length < 3 && <div className="chat-suggestions">{starterQuestions.map(question => <button type="button" onClick={() => askPortfolio(question)} key={question}>{question}</button>)}</div>}
+        <form className="chat-form" onSubmit={event => { event.preventDefault(); askPortfolio(chatInput); }}><input value={chatInput} onChange={event => setChatInput(event.target.value)} placeholder="Ask about Arun…" aria-label="Ask Arun's portfolio assistant"/><button type="submit" disabled={!chatInput.trim() || chatThinking} aria-label="Send message">↗</button></form>
+      </section>}
+      <button className="robot-trigger" type="button" onClick={() => setChatOpen(open => !open)} aria-label={chatOpen ? "Close portfolio assistant" : "Open portfolio assistant"} aria-expanded={chatOpen}><span className="robot-halo"/><Image src="/ai-companion.png" alt="" width={900} height={600} priority/><span className="robot-status"><i/> AI GUIDE</span></button>
+    </div>
     {commandOpen && <div className="command-overlay" role="presentation" onMouseDown={() => setCommandOpen(false)}><section className="command-panel" role="dialog" aria-modal="true" aria-label="Command menu" onMouseDown={event => event.stopPropagation()}><div className="command-search"><span>›_</span><input autoFocus value={commandQuery} onChange={event => setCommandQuery(event.target.value)} placeholder="Navigate or search…" aria-label="Search commands"/><kbd>ESC</kbd></div><div className="command-list">{visibleCommands.length ? visibleCommands.map(command => <button type="button" onClick={() => runCommand(command.href)} key={command.label}><span>{command.label}<small>{command.hint}</small></span><Arrow/></button>) : <p>No matching command.</p>}</div><div className="command-help"><span>TYPE TO FILTER</span><span>CLICK TO SELECT</span><span>ESC CLOSE</span></div></section></div>}
   </>;
 }
