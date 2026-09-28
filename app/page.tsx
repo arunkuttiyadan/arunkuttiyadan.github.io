@@ -75,10 +75,22 @@ export default function Home(){
       }
       if (event.key === "Escape") setCommandOpen(false);
     };
-    const onScroll = () => {
+    let scrollFrame = 0;
+    const renderScroll = () => {
       const height = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(height > 0 ? (window.scrollY / height) * 100 : 0);
+      const pageProgress = height > 0 ? window.scrollY / height : 0;
+      const heroProgress = Math.min(window.scrollY / Math.max(window.innerHeight, 1), 1);
+      setProgress(pageProgress * 100);
+      document.documentElement.style.setProperty("--page-progress", pageProgress.toFixed(4));
+      document.documentElement.style.setProperty("--hero-progress", heroProgress.toFixed(4));
+      document.querySelectorAll<HTMLElement>("[data-depth]").forEach(element => {
+        const bounds = element.getBoundingClientRect();
+        const offset = (bounds.top + bounds.height / 2 - window.innerHeight / 2) / window.innerHeight;
+        element.style.setProperty("--depth-shift", `${Math.max(-42, Math.min(42, offset * -42)).toFixed(1)}px`);
+      });
+      scrollFrame = 0;
     };
+    const onScroll = () => { if (!scrollFrame) scrollFrame = window.requestAnimationFrame(renderScroll); };
     const onPointerMove = (event: PointerEvent) => {
       const x = (event.clientX / window.innerWidth - .5) * 10;
       const y = (event.clientY / window.innerHeight - .5) * -8;
@@ -87,8 +99,9 @@ export default function Home(){
     };
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("scroll", onScroll, { passive:true });
+    window.addEventListener("resize", onScroll, { passive:true });
     window.addEventListener("pointermove", onPointerMove, { passive:true });
-    onScroll();
+    renderScroll();
     const observer = new IntersectionObserver(entries => entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add("is-visible");
@@ -98,8 +111,10 @@ export default function Home(){
     document.querySelectorAll("[data-reveal]").forEach(element => observer.observe(element));
     return () => {
       window.clearInterval(timer);
+      if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       window.removeEventListener("pointermove", onPointerMove);
       observer.disconnect();
     };
@@ -111,6 +126,22 @@ export default function Home(){
     const bounds = event.currentTarget.getBoundingClientRect();
     event.currentTarget.style.setProperty("--mx", `${event.clientX - bounds.left}px`);
     event.currentTarget.style.setProperty("--my", `${event.clientY - bounds.top}px`);
+  };
+
+  const onCardMove = (event: React.PointerEvent<HTMLElement>) => {
+    if (event.pointerType === "touch") return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - .5;
+    const y = (event.clientY - bounds.top) / bounds.height - .5;
+    event.currentTarget.style.setProperty("--tilt-x", `${(-y * 5).toFixed(2)}deg`);
+    event.currentTarget.style.setProperty("--tilt-y", `${(x * 6).toFixed(2)}deg`);
+    event.currentTarget.style.setProperty("--glow-x", `${((x + .5) * 100).toFixed(1)}%`);
+    event.currentTarget.style.setProperty("--glow-y", `${((y + .5) * 100).toFixed(1)}%`);
+  };
+
+  const resetCard = (event: React.PointerEvent<HTMLElement>) => {
+    event.currentTarget.style.setProperty("--tilt-x", "0deg");
+    event.currentTarget.style.setProperty("--tilt-y", "0deg");
   };
 
   const runCommand = (href: string) => {
@@ -136,6 +167,7 @@ export default function Home(){
 
   return <>
     <div className="scroll-progress" style={{ width:`${progress}%` }} aria-hidden="true" />
+    <div className="scroll-scene" aria-hidden="true"><i/><i/><i/></div>
     <a className="skip" href="#main">Skip to content</a>
     <header>
       <a className="brand" href="#top"><span>AK</span> / AI LAB</a>
@@ -165,11 +197,11 @@ export default function Home(){
         </div>
         <div className="timeline"><span>2023</span><i/><span>FOUNDATIONS</span><i/><span>FULL STACK</span><i/><span>LLM + RAG</span><i/><span>2026</span></div>
       </section>
-      <section className="intro-strip" data-reveal><p>I&apos;m interested in the hard parts of applied AI: <b>how context is retrieved, how outputs are evaluated, how privacy is protected, and how a model becomes a dependable product.</b></p></section>
+      <section className="intro-strip" data-reveal><p data-depth>I&apos;m interested in the hard parts of applied AI: <b>how context is retrieved, how outputs are evaluated, how privacy is protected, and how a model becomes a dependable product.</b></p></section>
       <section className="work" id="work" data-reveal>
         <SectionHead label="01 / SELECTED AI WORK" title="Systems, not demos." copy="Experiments and products focused on grounded outputs, transparent reasoning and useful human control."/>
         <div className="filter-row" role="group" aria-label="Filter AI projects">{filters.map(filter => <button className={projectFilter === filter ? "active" : ""} type="button" onClick={() => setProjectFilter(filter)} aria-pressed={projectFilter === filter} key={filter}>{filter}</button>)}</div>
-        <div className="ai-projects">{visibleProjects.map(p => <article className="ai-card" key={p.title}><div className="card-top"><span>{p.id}</span><span className="status-pill"><i/> {p.status}</span></div><p className="project-kind">{p.kind}</p><h3>{p.title}</h3><p className="project-copy">{p.description}</p><ul>{p.stack.map(s => <li key={s}>{s}</li>)}</ul><p className="project-note">{'// '}{p.note}</p>{p.link && <a className="project-link" href={p.link} target="_blank" rel="noreferrer">VIEW SOURCE <Arrow/></a>}</article>)}</div>
+        <div className="ai-projects">{visibleProjects.map(p => <article className="ai-card" onPointerMove={onCardMove} onPointerLeave={resetCard} key={p.title}><div className="card-top"><span>{p.id}</span><span className="status-pill"><i/> {p.status}</span></div><p className="project-kind">{p.kind}</p><h3>{p.title}</h3><p className="project-copy">{p.description}</p><ul>{p.stack.map(s => <li key={s}>{s}</li>)}</ul><p className="project-note">{'// '}{p.note}</p>{p.link && <a className="project-link" href={p.link} target="_blank" rel="noreferrer">VIEW SOURCE <Arrow/></a>}</article>)}</div>
       </section>
       <section className="stack-section" id="stack" data-reveal><SectionHead label="02 / ENGINEERING RANGE" title="Beyond the model." copy="Strong AI products still need well-shaped APIs, reliable persistence and interfaces that communicate clearly."/><div className="stack-grid"><div className="stack-list"><p><span>AI / ML</span>LangChain, Hugging Face, Ollama, TensorFlow, PyTorch, scikit-learn</p><p><span>RETRIEVAL</span>Embeddings, semantic search, FAISS, ChromaDB, chunking, citations</p><p><span>BACKEND</span>Python, FastAPI, Node.js, Express, REST, SQL, MongoDB, SQLite</p><p><span>PRODUCT</span>React, JavaScript, Flutter, Dart, Kotlin, Android, Git</p></div><div className="secondary-work">{fullStack.map((p,i) => <article key={p[0]}><span>0{i+1}</span><div><h3>{p[0]}</h3><p>{p[1]}</p><small>{p[2]}</small></div></article>)}</div></div></section>
       <section className="about" id="about" data-reveal><p className="label">03 / OPERATING PRINCIPLES</p><div className="about-grid"><h2>Learning AI by<br/>building the whole loop.</h2><div><p>I&apos;m a Computer Science student specializing in AI at VIT-AP, focused on the full lifecycle of intelligent systems: preparing data, retrieving the right context, constraining model behavior, evaluating outputs, and shipping the experience behind a clean product interface.</p><p>My projects are how I test those ideas—local-first screening with human oversight, source-grounded document answers, code-aware retrieval and safety-focused mobile intelligence. Contributing to the VIT-AP Machine Learning Club also sharpened how I explain technical ideas to people.</p></div></div><div className="facts"><p><span>PROGRAM</span><b>B.Tech CSE · AI Specialization</b><small>VIT-AP University · 2023–2027</small></p><p><span>CGPA</span><b>8.01 / 10</b><small>Current academic record</small></p><p><span>APPROACH</span><b>Build · Evaluate · Iterate</b><small>Responsible, product-minded AI</small></p></div></section>
@@ -190,4 +222,4 @@ export default function Home(){
   </>;
 }
 
-function SectionHead({label,title,copy}:{label:string,title:string,copy:string}){ return <div className="section-head"><div><p className="label">{label}</p><h2>{title}</h2></div><p>{copy}</p></div>; }
+function SectionHead({label,title,copy}:{label:string,title:string,copy:string}){ return <div className="section-head" data-depth><div><p className="label">{label}</p><h2>{title}</h2></div><p>{copy}</p></div>; }
