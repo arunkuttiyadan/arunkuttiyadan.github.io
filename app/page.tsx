@@ -58,9 +58,11 @@ export default function Home(){
   const [chatInput, setChatInput] = useState("");
   const [chatThinking, setChatThinking] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{ role:"assistant", text:"Hi, I'm Arun's portfolio guide. Ask me about his AI work, technical stack or availability." }]);
+  const [feedbackPrepared, setFeedbackPrepared] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
   const companionRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const feedbackFormRef = useRef<HTMLFormElement>(null);
 
   const visibleProjects = useMemo(() => projectFilter === "ALL" ? aiProjects : aiProjects.filter(project => project.category === projectFilter), [projectFilter]);
   const visibleCommands = useMemo(() => commands.filter(command => normalizeSearch(`${command.label} ${command.hint}`).includes(normalizeSearch(commandQuery))), [commandQuery]);
@@ -166,6 +168,25 @@ export default function Home(){
     }, 650);
   };
 
+  const prepareFeedback = (form: HTMLFormElement, destination:"email" | "gmail") => {
+    if (!form.reportValidity()) return;
+    const data = new FormData(form);
+    const perspective = String(data.get("Perspective") || "Not specified");
+    const area = String(data.get("Feedback area") || "General feedback");
+    const suggestion = String(data.get("Suggestion") || "");
+    const name = String(data.get("Name") || "Anonymous visitor");
+    const email = String(data.get("email") || "Not provided");
+    const subject = `Portfolio feedback: ${area}`;
+    const body = `Hi Arun,\n\nHere is my feedback to help you grow as an AI engineer.\n\nPerspective: ${perspective}\nFeedback area: ${area}\n\nSuggestion:\n${suggestion}\n\nFrom: ${name}\nReply email: ${email}\n\nSent from arunk.site`;
+    if (destination === "gmail") {
+      const params = new URLSearchParams({ view:"cm", fs:"1", to:"arunkuttiyadan@gmail.com", su:subject, body });
+      window.open(`https://mail.google.com/mail/?${params.toString()}`, "_blank", "noopener,noreferrer");
+    } else {
+      window.location.assign(`mailto:arunkuttiyadan@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+    }
+    setFeedbackPrepared(true);
+  };
+
   return <>
     <div className="scroll-progress" style={{ width:`${progress}%` }} aria-hidden="true" />
     <div className="scroll-scene" aria-hidden="true"><i/><i/><i/></div>
@@ -209,16 +230,12 @@ export default function Home(){
       <section className="feedback" id="feedback" data-reveal>
         <div className="feedback-copy" data-depth><p className="label">04 / OPEN FEEDBACK LOOP</p><h2>Help me become a<br/><em>better AI engineer.</em></h2><p>If you see a skill gap, a stronger project direction or an engineering habit I should develop, I&apos;d value your honest perspective.</p><div className="feedback-signals"><span>SKILLS TO LEARN</span><span>PROJECT IDEAS</span><span>AI ENGINEERING</span><span>PORTFOLIO REVIEW</span></div></div>
         <div className="feedback-card">
-          <form action="https://formsubmit.co/arunkuttiyadan@gmail.com" method="POST">
-            <input type="hidden" name="_subject" value="New AI engineering feedback from arunk.site"/>
-            <input type="hidden" name="_next" value="https://arunk.site/thanks/"/>
-            <input type="hidden" name="_template" value="table"/>
-            <input type="hidden" name="_url" value="https://arunk.site/#feedback"/>
-            <label className="honey" aria-hidden="true">Leave this empty<input name="_honey" tabIndex={-1} autoComplete="off"/></label>
+          <form ref={feedbackFormRef} onSubmit={event => { event.preventDefault(); prepareFeedback(event.currentTarget, "email"); }}>
             <div className="form-row"><label><span>YOUR PERSPECTIVE</span><select name="Perspective" defaultValue="" required><option value="" disabled>Select one</option><option>AI / ML engineer</option><option>Software engineer</option><option>Recruiter</option><option>Student or peer</option><option>Educator or mentor</option><option>Other</option></select></label><label><span>FEEDBACK AREA</span><select name="Feedback area" defaultValue="" required><option value="" disabled>Choose a focus</option><option>Skills I should learn next</option><option>AI / ML depth</option><option>Project ideas</option><option>Software engineering practices</option><option>Portfolio and presentation</option><option>Career direction</option></select></label></div>
             <label><span>YOUR SUGGESTION</span><textarea name="Suggestion" rows={6} maxLength={1500} required placeholder="What should I learn, build or improve next—and why?"/></label>
             <div className="form-row"><label><span>NAME <small>OPTIONAL</small></span><input type="text" name="Name" maxLength={80} autoComplete="name" placeholder="Your name"/></label><label><span>EMAIL <small>OPTIONAL</small></span><input type="email" name="email" maxLength={120} autoComplete="email" placeholder="If you'd like a reply"/></label></div>
-            <div className="feedback-submit"><p>Delivered through FormSubmit to my email. Name and email are optional.</p><button type="submit">SEND FEEDBACK <Arrow/></button></div>
+            {feedbackPrepared && <p className="feedback-ready" role="status">Your message is prepared. Review it in the email window and press Send.</p>}
+            <div className="feedback-submit"><p>Nothing is uploaded or stored here. Your chosen email service handles delivery.</p><div><button type="submit">OPEN EMAIL APP <Arrow/></button><button type="button" className="gmail-button" onClick={() => feedbackFormRef.current && prepareFeedback(feedbackFormRef.current, "gmail")}>SEND WITH GMAIL <Arrow/></button></div></div>
           </form>
         </div>
       </section>
