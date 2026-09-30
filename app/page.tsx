@@ -21,6 +21,7 @@ const commands = [
   { label:"Selected AI work", hint:"Go to section", href:"#work" },
   { label:"Engineering range", hint:"Go to section", href:"#stack" },
   { label:"About Arun", hint:"Go to section", href:"#about" },
+  { label:"Give feedback", hint:"Help Arun grow", href:"#feedback" },
   { label:"Start a conversation", hint:"Send an email", href:"mailto:arunkuttiyadan@gmail.com" },
   { label:"Download résumé", hint:"PDF", href:"/Arun-K-Resume.pdf" },
   { label:"GitHub profile", hint:"Open external", href:"https://github.com/arunkuttiyadan" },
@@ -171,7 +172,7 @@ export default function Home(){
     <a className="skip" href="#main">Skip to content</a>
     <header>
       <a className="brand" href="#top"><span>AK</span> / AI LAB</a>
-      <nav><a href="#work">01_WORK</a><a href="#stack">02_STACK</a><a href="#about">03_ABOUT</a></nav>
+      <nav><a href="#work">01_WORK</a><a href="#stack">02_STACK</a><a href="#about">03_ABOUT</a><a href="#feedback">04_FEEDBACK</a></nav>
       <div className="header-actions"><button className="command-trigger" type="button" onClick={() => setCommandOpen(true)} aria-label="Open command menu">⌘ K</button><a className="availability" href="mailto:arunkuttiyadan@gmail.com"><i/> AVAILABLE FOR WORK</a></div>
     </header>
     <main id="main">
@@ -205,7 +206,23 @@ export default function Home(){
       </section>
       <section className="stack-section" id="stack" data-reveal><SectionHead label="02 / ENGINEERING RANGE" title="Beyond the model." copy="Strong AI products still need well-shaped APIs, reliable persistence and interfaces that communicate clearly."/><div className="stack-grid"><div className="stack-list"><p><span>AI / ML</span>LangChain, Hugging Face, Ollama, TensorFlow, PyTorch, scikit-learn</p><p><span>RETRIEVAL</span>Embeddings, semantic search, FAISS, ChromaDB, chunking, citations</p><p><span>BACKEND</span>Python, FastAPI, Node.js, Express, REST, SQL, MongoDB, SQLite</p><p><span>PRODUCT</span>React, JavaScript, Flutter, Dart, Kotlin, Android, Git</p></div><div className="secondary-work">{fullStack.map((p,i) => <article key={p[0]}><span>0{i+1}</span><div><h3>{p[0]}</h3><p>{p[1]}</p><small>{p[2]}</small></div></article>)}</div></div></section>
       <section className="about" id="about" data-reveal><p className="label">03 / OPERATING PRINCIPLES</p><div className="about-grid"><h2>Learning AI by<br/>building the whole loop.</h2><div><p>I&apos;m a Computer Science student specializing in AI at VIT-AP, focused on the full lifecycle of intelligent systems: preparing data, retrieving the right context, constraining model behavior, evaluating outputs, and shipping the experience behind a clean product interface.</p><p>My projects are how I test those ideas—local-first screening with human oversight, source-grounded document answers, code-aware retrieval and safety-focused mobile intelligence. Contributing to the VIT-AP Machine Learning Club also sharpened how I explain technical ideas to people.</p></div></div><div className="facts"><p><span>PROGRAM</span><b>B.Tech CSE · AI Specialization</b><small>VIT-AP University · 2023–2027</small></p><p><span>CGPA</span><b>8.01 / 10</b><small>Current academic record</small></p><p><span>APPROACH</span><b>Build · Evaluate · Iterate</b><small>Responsible, product-minded AI</small></p></div></section>
-      <section className="contact" data-reveal><p className="label">04 / START A CONVERSATION</p><h2>Have an AI problem<br/>worth solving?</h2><a className="mail" href="mailto:arunkuttiyadan@gmail.com">arunkuttiyadan@gmail.com <Arrow/></a><div><a href="tel:+918086062055">+91 80860 62055</a><a href="https://www.linkedin.com/in/arun-kuttiyadan/" target="_blank" rel="noreferrer">LINKEDIN <Arrow/></a><a href="https://github.com/arunkuttiyadan" target="_blank" rel="noreferrer">GITHUB <Arrow/></a></div></section>
+      <section className="feedback" id="feedback" data-reveal>
+        <div className="feedback-copy" data-depth><p className="label">04 / OPEN FEEDBACK LOOP</p><h2>Help me become a<br/><em>better AI engineer.</em></h2><p>If you see a skill gap, a stronger project direction or an engineering habit I should develop, I&apos;d value your honest perspective.</p><div className="feedback-signals"><span>SKILLS TO LEARN</span><span>PROJECT IDEAS</span><span>AI ENGINEERING</span><span>PORTFOLIO REVIEW</span></div></div>
+        <div className="feedback-card">
+          <form action="https://formsubmit.co/arunkuttiyadan@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="New AI engineering feedback from arunk.site"/>
+            <input type="hidden" name="_next" value="https://arunk.site/thanks/"/>
+            <input type="hidden" name="_template" value="table"/>
+            <input type="hidden" name="_url" value="https://arunk.site/#feedback"/>
+            <label className="honey" aria-hidden="true">Leave this empty<input name="_honey" tabIndex={-1} autoComplete="off"/></label>
+            <div className="form-row"><label><span>YOUR PERSPECTIVE</span><select name="Perspective" defaultValue="" required><option value="" disabled>Select one</option><option>AI / ML engineer</option><option>Software engineer</option><option>Recruiter</option><option>Student or peer</option><option>Educator or mentor</option><option>Other</option></select></label><label><span>FEEDBACK AREA</span><select name="Feedback area" defaultValue="" required><option value="" disabled>Choose a focus</option><option>Skills I should learn next</option><option>AI / ML depth</option><option>Project ideas</option><option>Software engineering practices</option><option>Portfolio and presentation</option><option>Career direction</option></select></label></div>
+            <label><span>YOUR SUGGESTION</span><textarea name="Suggestion" rows={6} maxLength={1500} required placeholder="What should I learn, build or improve next—and why?"/></label>
+            <div className="form-row"><label><span>NAME <small>OPTIONAL</small></span><input type="text" name="Name" maxLength={80} autoComplete="name" placeholder="Your name"/></label><label><span>EMAIL <small>OPTIONAL</small></span><input type="email" name="email" maxLength={120} autoComplete="email" placeholder="If you'd like a reply"/></label></div>
+            <div className="feedback-submit"><p>Delivered through FormSubmit to my email. Name and email are optional.</p><button type="submit">SEND FEEDBACK <Arrow/></button></div>
+          </form>
+        </div>
+      </section>
+      <section className="contact" data-reveal><p className="label">05 / START A CONVERSATION</p><h2>Have an AI problem<br/>worth solving?</h2><a className="mail" href="mailto:arunkuttiyadan@gmail.com">arunkuttiyadan@gmail.com <Arrow/></a><div><a href="tel:+918086062055">+91 80860 62055</a><a href="https://www.linkedin.com/in/arun-kuttiyadan/" target="_blank" rel="noreferrer">LINKEDIN <Arrow/></a><a href="https://github.com/arunkuttiyadan" target="_blank" rel="noreferrer">GITHUB <Arrow/></a></div></section>
     </main>
     <footer><p>ARUN K / AI LAB</p><p>DESIGNED & ENGINEERED WITH INTENT</p><p>© 2026</p></footer>
     <div className={`ai-companion ${chatOpen ? "is-open" : ""}`} ref={companionRef}>
