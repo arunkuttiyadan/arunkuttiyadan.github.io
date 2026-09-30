@@ -33,10 +33,15 @@ type ChatMessage = { role:"assistant" | "user"; text:string };
 
 const auraEndpoint = process.env.NEXT_PUBLIC_AURA_ENDPOINT?.trim();
 
-const starterQuestions = ["What does Arun build?", "Show me his AI skills", "How can I contact him?"];
+const starterQuestions = ["What does Arun build?", "What is RAG?", "Explain LLMs simply", "How can I contact him?"];
 
 function portfolioAnswer(question: string){
   const query = normalizeSearch(question);
+  if (/\bllms?\b|large language model/.test(query)) return "An LLM, or large language model, learns patterns from large amounts of text so it can understand and generate language. Applications use LLMs for tasks such as answering questions, summarizing documents, writing code and extracting information.";
+  if (/\brag\b|retrieval.?augmented/.test(query)) return "RAG stands for retrieval-augmented generation. It retrieves relevant information from a trusted knowledge source and gives that context to an LLM before it answers, helping responses stay more grounded, specific and traceable.";
+  if (/embedding|vector database|semantic search/.test(query)) return "An embedding represents text as a list of numbers that captures meaning. A vector database stores those representations and quickly finds semantically similar content, which is useful for search and RAG systems.";
+  if (/machine learning|\bml\b/.test(query)) return "Machine learning is a branch of AI where systems learn patterns from data to make predictions or decisions instead of following only hand-written rules.";
+  if (/what is ai|artificial intelligence/.test(query)) return "Artificial intelligence is the field of building systems that perform tasks associated with human intelligence, such as understanding language, recognizing patterns, reasoning and making decisions.";
   if (/contact|email|hire|reach|available/.test(query)) return "Arun is available for AI engineering and full-stack opportunities. You can reach him at arunkuttiyadan@gmail.com or use the contact section below.";
   if (/resume|cv|download/.test(query)) return "You can download Arun's résumé from the button in the hero section. It includes his education, technical skills and project experience.";
   if (/cgpa|education|college|university|degree|study/.test(query)) return "Arun is pursuing a B.Tech in Computer Science and Engineering with an AI specialization at VIT-AP University (2023–2027). His current CGPA is 8.01/10.";
