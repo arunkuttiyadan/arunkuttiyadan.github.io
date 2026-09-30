@@ -81,7 +81,7 @@ export default function Home(){
   const finishIntro = useCallback(() => {
     if (introLeaveTimerRef.current) window.clearTimeout(introLeaveTimerRef.current);
     if (introHideTimerRef.current) window.clearTimeout(introHideTimerRef.current);
-    try { window.sessionStorage.setItem("ak-intro-seen-v1", "true"); } catch {}
+    try { window.sessionStorage.setItem("ak-intro-seen-v2", "true"); } catch {}
     setIntroLeaving(true);
     introHideTimerRef.current = window.setTimeout(() => {
       setIntroVisible(false);
@@ -92,7 +92,7 @@ export default function Home(){
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let alreadySeen = false;
-    try { alreadySeen = window.sessionStorage.getItem("ak-intro-seen-v1") === "true"; } catch {}
+    try { alreadySeen = window.sessionStorage.getItem("ak-intro-seen-v2") === "true"; } catch {}
     if (prefersReducedMotion || alreadySeen) {
       introHideTimerRef.current = window.setTimeout(() => setIntroVisible(false), 0);
       return () => {
@@ -100,7 +100,7 @@ export default function Home(){
       };
     }
     document.body.classList.add("intro-playing");
-    introLeaveTimerRef.current = window.setTimeout(finishIntro, 4600);
+    introLeaveTimerRef.current = window.setTimeout(finishIntro, 6500);
     return () => {
       if (introLeaveTimerRef.current) window.clearTimeout(introLeaveTimerRef.current);
       if (introHideTimerRef.current) window.clearTimeout(introHideTimerRef.current);
@@ -247,7 +247,9 @@ export default function Home(){
 
   return <>
     {introVisible && <section className={`intro-film ${introLeaving ? "is-leaving" : ""}`} aria-label="Portfolio introduction" aria-live="polite">
-      <Image className="intro-film-image" src="/generated/ai-engineer-intro.jpg" alt="" fill priority sizes="100vw"/>
+      <video className="intro-film-video" autoPlay muted playsInline preload="auto" poster="/generated/ai-engineer-intro.jpg" onEnded={finishIntro} aria-hidden="true">
+        <source src="/generated/ai-engineer-intro.mp4" type="video/mp4"/>
+      </video>
       <div className="intro-film-grid" aria-hidden="true"/>
       <div className="intro-film-glow" aria-hidden="true"/>
       <div className="intro-film-copy">
