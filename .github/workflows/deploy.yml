@@ -25,6 +25,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          NEXT_PUBLIC_AURA_ENDPOINT: ${{ vars.AURA_ENDPOINT }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

@@ -31,6 +31,8 @@ const normalizeSearch = (value: string) => value.normalize("NFD").replace(/[\u03
 
 type ChatMessage = { role:"assistant" | "user"; text:string };
 
+const auraEndpoint = process.env.NEXT_PUBLIC_AURA_ENDPOINT?.trim();
+
 const starterQuestions = ["What does Arun build?", "Show me his AI skills", "How can I contact him?"];
 
 function portfolioAnswer(question: string){
@@ -57,7 +59,7 @@ export default function Home(){
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatThinking, setChatThinking] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{ role:"assistant", text:"Hi, I'm Arun's portfolio guide. Ask me about his AI work, technical stack or availability." }]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{ role:"assistant", text:"Hi, I'm AURA—Arun's AI portfolio guide. Ask me about his work, technical stack or availability." }]);
   const [feedbackPrepared, setFeedbackPrepared] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
   const companionRef = useRef<HTMLDivElement>(null);
@@ -155,17 +157,34 @@ export default function Home(){
     else window.location.assign(href);
   };
 
-  const askPortfolio = (question: string) => {
+  const askPortfolio = async (question: string) => {
     const cleanQuestion = question.trim();
     if (!cleanQuestion || chatThinking) return;
+    const conversation = [...chatMessages, { role:"user" as const, text:cleanQuestion }];
     setChatOpen(true);
     setChatInput("");
-    setChatMessages(messages => [...messages, { role:"user", text:cleanQuestion }]);
+    setChatMessages(conversation);
     setChatThinking(true);
-    window.setTimeout(() => {
+    try {
+      if (!auraEndpoint) throw new Error("AURA endpoint is not configured");
+      const response = await fetch(auraEndpoint, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({
+          question:cleanQuestion,
+          history:conversation.slice(-8).map(message => ({ role:message.role, text:message.text.slice(0, 1200) })),
+        }),
+      });
+      if (!response.ok) throw new Error(`AURA request failed (${response.status})`);
+      const data = await response.json() as { answer?:unknown };
+      const answer = typeof data.answer === "string" ? data.answer.trim() : "";
+      if (!answer) throw new Error("AURA returned an empty answer");
+      setChatMessages(messages => [...messages, { role:"assistant", text:answer }]);
+    } catch {
       setChatMessages(messages => [...messages, { role:"assistant", text:portfolioAnswer(cleanQuestion) }]);
+    } finally {
       setChatThinking(false);
-    }, 650);
+    }
   };
 
   const prepareFeedback = (form: HTMLFormElement, destination:"email" | "gmail") => {
@@ -243,14 +262,14 @@ export default function Home(){
     </main>
     <footer><p>ARUN K / AI LAB</p><p>DESIGNED & ENGINEERED WITH INTENT</p><p>© 2026</p></footer>
     <div className={`ai-companion ${chatOpen ? "is-open" : ""}`} ref={companionRef}>
-      {!chatOpen && <span className="companion-callout">ASK ARUN.AI <i>●</i></span>}
+      {!chatOpen && <span className="companion-callout">ASK AURA <i>●</i></span>}
       {chatOpen && <section className="chat-panel" aria-label="Arun portfolio assistant">
-        <div className="chat-head"><div><span><i/> ARUN.AI</span><small>PORTFOLIO GUIDE · ONLINE</small></div><button type="button" onClick={() => setChatOpen(false)} aria-label="Close chat">×</button></div>
+        <div className="chat-head"><div><span><i/> AURA</span><small>{auraEndpoint ? "GEMINI · PORTFOLIO GUIDE" : "PORTFOLIO GUIDE · ONLINE"}</small></div><button type="button" onClick={() => setChatOpen(false)} aria-label="Close chat">×</button></div>
         <div className="chat-messages" aria-live="polite">{chatMessages.map((message,index) => <p className={message.role} key={`${message.role}-${index}`}><span>{message.role === "assistant" ? "AK" : "YOU"}</span>{message.text}</p>)}{chatThinking && <p className="assistant typing"><span>AK</span><i/><i/><i/></p>}<div ref={chatEndRef}/></div>
         {chatMessages.length < 3 && <div className="chat-suggestions">{starterQuestions.map(question => <button type="button" onClick={() => askPortfolio(question)} key={question}>{question}</button>)}</div>}
-        <form className="chat-form" onSubmit={event => { event.preventDefault(); askPortfolio(chatInput); }}><input value={chatInput} onChange={event => setChatInput(event.target.value)} placeholder="Ask about Arun…" aria-label="Ask Arun's portfolio assistant"/><button type="submit" disabled={!chatInput.trim() || chatThinking} aria-label="Send message">↗</button></form>
+        <form className="chat-form" onSubmit={event => { event.preventDefault(); askPortfolio(chatInput); }}><input value={chatInput} onChange={event => setChatInput(event.target.value)} maxLength={500} placeholder="Ask about Arun…" aria-label="Ask Arun's portfolio assistant"/><button type="submit" disabled={!chatInput.trim() || chatThinking} aria-label="Send message">↗</button></form>
       </section>}
-      <button className="robot-trigger" type="button" onClick={() => setChatOpen(open => !open)} aria-label={chatOpen ? "Close portfolio assistant" : "Open portfolio assistant"} aria-expanded={chatOpen}><span className="robot-halo"/><Image src="/ai-companion.png" alt="" width={900} height={600} priority/><span className="robot-status"><i/> AI GUIDE</span></button>
+      <button className="robot-trigger" type="button" onClick={() => setChatOpen(open => !open)} aria-label={chatOpen ? "Close AURA" : "Open AURA portfolio assistant"} aria-expanded={chatOpen}><span className="robot-halo"/><Image src="/ai-companion.png" alt="" width={900} height={600} priority/><span className="robot-status"><i/> AURA AI</span></button>
     </div>
     {commandOpen && <div className="command-overlay" role="presentation" onMouseDown={() => setCommandOpen(false)}><section className="command-panel" role="dialog" aria-modal="true" aria-label="Command menu" onMouseDown={event => event.stopPropagation()}><div className="command-search"><span>›_</span><input autoFocus value={commandQuery} onChange={event => setCommandQuery(event.target.value)} placeholder="Navigate or search…" aria-label="Search commands"/><kbd>ESC</kbd></div><div className="command-list">{visibleCommands.length ? visibleCommands.map(command => <button type="button" onClick={() => runCommand(command.href)} key={command.label}><span>{command.label}<small>{command.hint}</small></span><Arrow/></button>) : <p>No matching command.</p>}</div><div className="command-help"><span>TYPE TO FILTER</span><span>CLICK TO SELECT</span><span>ESC CLOSE</span></div></section></div>}
   </>;
