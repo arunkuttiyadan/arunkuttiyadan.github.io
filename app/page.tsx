@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 
 const aiProjects = [
@@ -66,13 +66,47 @@ export default function Home(){
   const [chatThinking, setChatThinking] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{ role:"assistant", text:"Hi, I'm AURA—Arun's AI portfolio guide. Ask me about his work, technical stack or availability." }]);
   const [feedbackPrepared, setFeedbackPrepared] = useState(false);
+  const [introVisible, setIntroVisible] = useState(true);
+  const [introLeaving, setIntroLeaving] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
   const companionRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const feedbackFormRef = useRef<HTMLFormElement>(null);
+  const introLeaveTimerRef = useRef<number | null>(null);
+  const introHideTimerRef = useRef<number | null>(null);
 
   const visibleProjects = useMemo(() => projectFilter === "ALL" ? aiProjects : aiProjects.filter(project => project.category === projectFilter), [projectFilter]);
   const visibleCommands = useMemo(() => commands.filter(command => normalizeSearch(`${command.label} ${command.hint}`).includes(normalizeSearch(commandQuery))), [commandQuery]);
+
+  const finishIntro = useCallback(() => {
+    if (introLeaveTimerRef.current) window.clearTimeout(introLeaveTimerRef.current);
+    if (introHideTimerRef.current) window.clearTimeout(introHideTimerRef.current);
+    try { window.sessionStorage.setItem("ak-intro-seen-v1", "true"); } catch {}
+    setIntroLeaving(true);
+    introHideTimerRef.current = window.setTimeout(() => {
+      setIntroVisible(false);
+      document.body.classList.remove("intro-playing");
+    }, 700);
+  }, []);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let alreadySeen = false;
+    try { alreadySeen = window.sessionStorage.getItem("ak-intro-seen-v1") === "true"; } catch {}
+    if (prefersReducedMotion || alreadySeen) {
+      introHideTimerRef.current = window.setTimeout(() => setIntroVisible(false), 0);
+      return () => {
+        if (introHideTimerRef.current) window.clearTimeout(introHideTimerRef.current);
+      };
+    }
+    document.body.classList.add("intro-playing");
+    introLeaveTimerRef.current = window.setTimeout(finishIntro, 4600);
+    return () => {
+      if (introLeaveTimerRef.current) window.clearTimeout(introLeaveTimerRef.current);
+      if (introHideTimerRef.current) window.clearTimeout(introHideTimerRef.current);
+      document.body.classList.remove("intro-playing");
+    };
+  }, [finishIntro]);
 
   useEffect(() => {
     const updateTime = () => setTime(new Intl.DateTimeFormat("en-GB", { timeZone:"Asia/Kolkata", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false }).format(new Date()));
@@ -212,6 +246,18 @@ export default function Home(){
   };
 
   return <>
+    {introVisible && <section className={`intro-film ${introLeaving ? "is-leaving" : ""}`} aria-label="Portfolio introduction" aria-live="polite">
+      <Image className="intro-film-image" src="/generated/ai-engineer-intro.jpg" alt="" fill priority sizes="100vw"/>
+      <div className="intro-film-grid" aria-hidden="true"/>
+      <div className="intro-film-glow" aria-hidden="true"/>
+      <div className="intro-film-copy">
+        <p className="intro-film-kicker"><i/> ARUN K · AI ENGINEER</p>
+        <h2><span>Engineering ideas.</span><em>Training intelligence.</em></h2>
+        <p className="intro-film-line">DATA <b>→</b> CONTEXT <b>→</b> MODEL <b>→</b> PRODUCT</p>
+      </div>
+      <div className="intro-film-footer"><span>PORTFOLIO BOOT SEQUENCE</span><div><i/><i/><i/><i/></div><button type="button" onClick={finishIntro}>SKIP INTRO ↗</button></div>
+      <div className="intro-film-progress" aria-hidden="true"><i/></div>
+    </section>}
     <div className="scroll-progress" style={{ width:`${progress}%` }} aria-hidden="true" />
     <div className="scroll-scene" aria-hidden="true"><i/><i/><i/></div>
     <a className="skip" href="#main">Skip to content</a>
