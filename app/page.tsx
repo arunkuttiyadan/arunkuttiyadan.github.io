@@ -81,7 +81,7 @@ export default function Home(){
   const finishIntro = useCallback(() => {
     if (introLeaveTimerRef.current) window.clearTimeout(introLeaveTimerRef.current);
     if (introHideTimerRef.current) window.clearTimeout(introHideTimerRef.current);
-    try { window.sessionStorage.setItem("ak-intro-seen-v2", "true"); } catch {}
+    try { window.sessionStorage.setItem("ak-intro-seen-v3", "true"); } catch {}
     setIntroLeaving(true);
     introHideTimerRef.current = window.setTimeout(() => {
       setIntroVisible(false);
@@ -92,7 +92,7 @@ export default function Home(){
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let alreadySeen = false;
-    try { alreadySeen = window.sessionStorage.getItem("ak-intro-seen-v2") === "true"; } catch {}
+    try { alreadySeen = window.sessionStorage.getItem("ak-intro-seen-v3") === "true"; } catch {}
     if (prefersReducedMotion || alreadySeen) {
       introHideTimerRef.current = window.setTimeout(() => setIntroVisible(false), 0);
       return () => {
@@ -264,32 +264,28 @@ export default function Home(){
     <div className="scroll-scene" aria-hidden="true"><i/><i/><i/></div>
     <a className="skip" href="#main">Skip to content</a>
     <header>
-      <a className="brand" href="#top"><span>AK</span> / AI LAB</a>
-      <nav><a href="#work">01_WORK</a><a href="#stack">02_STACK</a><a href="#about">03_ABOUT</a><a href="#feedback">04_FEEDBACK</a></nav>
-      <div className="header-actions"><button className="command-trigger" type="button" onClick={() => setCommandOpen(true)} aria-label="Open command menu">⌘ K</button><a className="availability" href="mailto:arunkuttiyadan@gmail.com"><i/> AVAILABLE FOR WORK</a></div>
+      <a className="brand" href="#top"><span className="brand-mark">AK</span><b>Arun Intelligence</b></a>
+      <nav><a href="#work">Projects</a><a href="#stack">Capabilities</a><a href="#about">About</a><a href="#feedback">Feedback</a></nav>
+      <div className="header-actions"><button className="command-trigger" type="button" onClick={() => setCommandOpen(true)} aria-label="Open command menu">⌘ K</button><a className="availability" href="mailto:arunkuttiyadan@gmail.com"><i/> MEET ARUN</a></div>
     </header>
     <main id="main">
       <section className="hero" id="top" ref={heroRef} onMouseMove={onHeroMove}>
         <div className="scan" aria-hidden="true"/>
-        <div className="hero-meta"><span>ARUN K</span><span>INDIA · IST · {time}</span><span>AI ENGINEER / FULL-STACK BUILDER</span></div>
+        <div className="hero-meta"><span>AUTONOMOUS INTELLIGENCE <i/></span><span>INDIA · IST · {time}</span><span>AI ENGINEER / PRODUCT BUILDER</span></div>
         <div className="hero-grid">
-          <div className="hero-copy"><p className="prompt">arun@portfolio:~$ whoami<span className="cursor">_</span></p><h1>Building AI that<br/><em>earns its output.</em></h1><p className="lede">I engineer retrieval systems, local LLM workflows and AI-assisted products—then build the APIs and interfaces that make them genuinely useful.</p><div className="hero-actions"><a href="#work">VIEW SELECTED WORK <Arrow/></a><a href="/Arun-K-Resume.pdf" download>DOWNLOAD RÉSUMÉ ↓</a></div></div>
-          <aside className="terminal"><div className="terminal-bar"><span><i/><i/><i/></span><b>profile.json</b><button type="button" onClick={() => setCommandOpen(true)}>⌘ K</button></div><pre>{`{
-  "role": "AI Engineer",
-  "focus": [
-    "LLM applications",
-    "RAG & semantic search",
-    "responsible AI systems"
-  ],
-  "engineering": [
-    "Python / FastAPI",
-    "React / Node.js",
-    "Vector databases"
-  ],
-  "currently": "shipping"
-}`}</pre><div className="terminal-foot"><span>● SYSTEM READY</span><span>v1.1.0 · LIVE</span></div></aside>
+          <div className="hero-copy"><p className="prompt">AI ENGINEER · LLM SYSTEMS · RAG</p><h1>RETRIEVE.<br/>REASON.<br/><em>SHIP.</em></h1><p className="lede">I build grounded AI systems that understand context, connect to useful tools, and turn model intelligence into dependable products.</p><div className="hero-actions"><a href="#work">EXPLORE MY SYSTEMS <Arrow/></a><a href="/Arun-K-Resume.pdf" download>GET MY RÉSUMÉ ↓</a></div></div>
+          <aside className="agent-stage" aria-label="Arun's AI engineering capabilities">
+            <div className="agent-orbit orbit-one"/><div className="agent-orbit orbit-two"/>
+            <div className="agent-beam"/><div className="agent-particles"><i/><i/><i/><i/><i/><i/></div>
+            <Image className="agent-visual" src="/ai-companion.png" alt="AURA, Arun's AI portfolio assistant" width={900} height={600} priority/>
+            <div className="agent-module module-memory"><span>▦</span><p><b>MEMORY</b>Vector retrieval</p></div>
+            <div className="agent-module module-reason"><span>◉</span><p><b>REASONING</b>Context online</p></div>
+            <div className="agent-module module-tools"><span>⌘</span><p><b>TOOLS</b>Full stack</p></div>
+            <div className="agent-module module-trust"><span>◇</span><p><b>TRUST</b>Human review</p></div>
+            <div className="agent-platform"><i/><i/><i/></div>
+          </aside>
         </div>
-        <div className="timeline"><span>2023</span><i/><span>FOUNDATIONS</span><i/><span>FULL STACK</span><i/><span>LLM + RAG</span><i/><span>2026</span></div>
+        <div className="timeline"><span><b>01</b> INGEST</span><i/><span><b>02</b> RETRIEVE</span><i/><span><b>03</b> REASON</span><i/><span><b>04</b> EVALUATE</span><i/><span><b>05</b> SHIP</span></div>
       </section>
       <section className="intro-strip" data-reveal><p data-depth>I&apos;m interested in the hard parts of applied AI: <b>how context is retrieved, how outputs are evaluated, how privacy is protected, and how a model becomes a dependable product.</b></p></section>
       <section className="work" id="work" data-reveal>
