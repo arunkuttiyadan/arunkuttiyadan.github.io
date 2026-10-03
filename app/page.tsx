@@ -29,11 +29,12 @@ const commands = [
 
 const normalizeSearch = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-type ChatMessage = { role:"assistant" | "user"; text:string };
+type ChatSource = { title:string; url:string };
+type ChatMessage = { role:"assistant" | "user"; text:string; sources?:ChatSource[] };
 
 const auraEndpoint = process.env.NEXT_PUBLIC_AURA_ENDPOINT?.trim();
 
-const starterQuestions = ["What does Arun build?", "What is RAG?", "Explain LLMs simply", "How can I contact him?"];
+const starterQuestions = ["What does Arun build?", "Explain RAG simply", "What's new in AI?", "Help me learn Python"];
 
 function portfolioAnswer(question: string){
   const query = normalizeSearch(question);
@@ -64,7 +65,7 @@ export default function Home(){
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatThinking, setChatThinking] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{ role:"assistant", text:"Hi, I'm AURA—Arun's AI portfolio guide. Ask me about his work, technical stack or availability." }]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{ role:"assistant", text:"Hi, I'm AURA. Ask me anything—from Arun's projects and AI concepts to coding, science, careers, or everyday questions." }]);
   const [feedbackPrepared, setFeedbackPrepared] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
   const companionRef = useRef<HTMLDivElement>(null);
@@ -181,10 +182,11 @@ export default function Home(){
         }),
       });
       if (!response.ok) throw new Error(`AURA request failed (${response.status})`);
-      const data = await response.json() as { answer?:unknown };
+      const data = await response.json() as { answer?:unknown; sources?:unknown };
       const answer = typeof data.answer === "string" ? data.answer.trim() : "";
       if (!answer) throw new Error("AURA returned an empty answer");
-      setChatMessages(messages => [...messages, { role:"assistant", text:answer }]);
+      const sources = Array.isArray(data.sources) ? data.sources.filter((source): source is ChatSource => Boolean(source && typeof source === "object" && typeof (source as ChatSource).title === "string" && typeof (source as ChatSource).url === "string")) : [];
+      setChatMessages(messages => [...messages, { role:"assistant", text:answer, sources }]);
     } catch {
       setChatMessages(messages => [...messages, { role:"assistant", text:portfolioAnswer(cleanQuestion) }]);
     } finally {
@@ -265,10 +267,10 @@ export default function Home(){
     <div className={`ai-companion ${chatOpen ? "is-open" : ""}`} ref={companionRef}>
       {!chatOpen && <span className="companion-callout">ASK AURA <i>●</i></span>}
       {chatOpen && <section className="chat-panel" aria-label="Arun portfolio assistant">
-        <div className="chat-head"><div><span><i/> AURA</span><small>{auraEndpoint ? "GEMINI · PORTFOLIO GUIDE" : "PORTFOLIO GUIDE · ONLINE"}</small></div><button type="button" onClick={() => setChatOpen(false)} aria-label="Close chat">×</button></div>
-        <div className="chat-messages" aria-live="polite">{chatMessages.map((message,index) => <p className={message.role} key={`${message.role}-${index}`}><span>{message.role === "assistant" ? "AK" : "YOU"}</span>{message.text}</p>)}{chatThinking && <p className="assistant typing"><span>AK</span><i/><i/><i/></p>}<div ref={chatEndRef}/></div>
+        <div className="chat-head"><div><span><i/> AURA</span><small>{auraEndpoint ? "GEMINI · GENERAL + PORTFOLIO AI" : "GENERAL AI · ONLINE"}</small></div><button type="button" onClick={() => setChatOpen(false)} aria-label="Close chat">×</button></div>
+        <div className="chat-messages" aria-live="polite">{chatMessages.map((message,index) => <p className={message.role} key={`${message.role}-${index}`}><span>{message.role === "assistant" ? "AURA" : "YOU"}</span>{message.text}{Boolean(message.sources?.length) && <span className="chat-sources">{message.sources?.map(source => <a href={source.url} target="_blank" rel="noreferrer" key={source.url}>{source.title} ↗</a>)}</span>}</p>)}{chatThinking && <p className="assistant typing"><span>AURA</span><i/><i/><i/></p>}<div ref={chatEndRef}/></div>
         {chatMessages.length < 3 && <div className="chat-suggestions">{starterQuestions.map(question => <button type="button" onClick={() => askPortfolio(question)} key={question}>{question}</button>)}</div>}
-        <form className="chat-form" onSubmit={event => { event.preventDefault(); askPortfolio(chatInput); }}><input value={chatInput} onChange={event => setChatInput(event.target.value)} maxLength={500} placeholder="Ask about Arun…" aria-label="Ask Arun's portfolio assistant"/><button type="submit" disabled={!chatInput.trim() || chatThinking} aria-label="Send message">↗</button></form>
+        <form className="chat-form" onSubmit={event => { event.preventDefault(); askPortfolio(chatInput); }}><input value={chatInput} onChange={event => setChatInput(event.target.value)} maxLength={1200} placeholder="Ask AURA anything…" aria-label="Ask AURA"/><button type="submit" disabled={!chatInput.trim() || chatThinking} aria-label="Send message">↗</button></form>
       </section>}
       <button className="robot-trigger" type="button" onClick={() => setChatOpen(open => !open)} aria-label={chatOpen ? "Close AURA" : "Open AURA portfolio assistant"} aria-expanded={chatOpen}><span className="robot-halo"/><Image src="/ai-companion.png" alt="" width={900} height={600} priority/><span className="robot-status"><i/> AURA AI</span></button>
     </div>
