@@ -67,6 +67,7 @@ export default function Home(){
   const [chatThinking, setChatThinking] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{ role:"assistant", text:"Hi, I'm AURA. Ask me anything—from Arun's projects and AI concepts to coding, science, careers, or everyday questions." }]);
   const [feedbackPrepared, setFeedbackPrepared] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const heroRef = useRef<HTMLElement>(null);
   const companionRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -74,6 +75,20 @@ export default function Home(){
 
   const visibleProjects = useMemo(() => projectFilter === "ALL" ? aiProjects : aiProjects.filter(project => project.category === projectFilter), [projectFilter]);
   const visibleCommands = useMemo(() => commands.filter(command => normalizeSearch(`${command.label} ${command.hint}`).includes(normalizeSearch(commandQuery))), [commandQuery]);
+
+  useEffect(() => {
+    const savedTheme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+    const frame = window.requestAnimationFrame(() => setTheme(savedTheme));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = nextTheme;
+    document.documentElement.style.colorScheme = nextTheme;
+    try { window.localStorage.setItem("ak-theme", nextTheme); } catch {}
+    setTheme(nextTheme);
+  };
 
   useEffect(() => {
     const updateTime = () => setTime(new Intl.DateTimeFormat("en-GB", { timeZone:"Asia/Kolkata", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false }).format(new Date()));
@@ -220,7 +235,7 @@ export default function Home(){
     <header>
       <a className="brand" href="#top"><span className="brand-mark">AK</span><b>Arun K</b></a>
       <nav><a href="#work">Projects</a><a href="#stack">Capabilities</a><a href="#about">About</a><a href="#feedback">Feedback</a></nav>
-      <div className="header-actions"><button className="command-trigger" type="button" onClick={() => setCommandOpen(true)} aria-label="Open command menu">⌘ K</button><a className="availability" href="mailto:arunkuttiyadan@gmail.com"><i/> MEET ARUN</a></div>
+      <div className="header-actions"><button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`} aria-pressed={theme === "light"}><span className="theme-icon" aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span><span className="theme-label">{theme === "dark" ? "LIGHT" : "DARK"}</span></button><button className="command-trigger" type="button" onClick={() => setCommandOpen(true)} aria-label="Open command menu">⌘ K</button><a className="availability" href="mailto:arunkuttiyadan@gmail.com"><i/> MEET ARUN</a></div>
     </header>
     <main id="main">
       <section className="hero" id="top" ref={heroRef} onMouseMove={onHeroMove}>

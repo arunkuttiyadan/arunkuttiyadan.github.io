@@ -11,4 +11,5 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   openGraph: { title: 'Arun K — AI Engineer', description: 'Building AI that earns its output.', url: 'https://arunk.site', type: 'website' },
 };
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en"><body className={`${body.variable} ${display.variable}`}>{children}</body></html>; }
+const themeScript = `(function(){try{var t=localStorage.getItem('ak-theme');var v=t==='light'?'light':'dark';document.documentElement.dataset.theme=v;document.documentElement.style.colorScheme=v;}catch(e){document.documentElement.dataset.theme='dark';document.documentElement.style.colorScheme='dark';}})();`;
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" data-theme="dark" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html:themeScript }}/></head><body className={`${body.variable} ${display.variable}`}>{children}</body></html>; }
