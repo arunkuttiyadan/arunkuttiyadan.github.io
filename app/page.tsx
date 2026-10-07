@@ -252,6 +252,10 @@ export default function Home(){
           <div className="hero-copy"><p className="prompt">AI ENGINEER · LLM SYSTEMS · RAG</p><h1><span className="hero-word">RETRIEVE.</span><br/><span className="hero-word">REASON.</span><br/><em className="hero-word">SHIP.</em></h1><p className="lede">I build grounded AI systems that understand context, connect to useful tools, and turn model intelligence into dependable products.</p><div className="hero-actions"><a href="#work">EXPLORE MY SYSTEMS <Arrow/></a><a href="/Arun-K-Resume.pdf" download>GET MY RÉSUMÉ ↓</a></div></div>
           <aside className="agent-stage" aria-label="Arun's AI engineering capabilities" onPointerMove={onCardMove} onPointerLeave={resetCard}>
             <SystemBlueprint motionPaused={motionPaused} onToggleMotion={() => setMotionPaused(paused => !paused)}/>
+            <MotionToggle className="dark-motion-toggle" motionPaused={motionPaused} onToggleMotion={() => setMotionPaused(paused => !paused)}/>
+            <svg className="agent-circuit" viewBox="0 0 600 570" preserveAspectRatio="none" aria-hidden="true">
+              {["M150 142H216V230H270", "M475 188H390V250H330", "M130 410H212V328H270", "M480 446H390V340H330"].map((path,index) => <g key={path} style={{ animationDelay:`${index * 1.75}s` }}><path className="circuit-track" d={path}/><path className="circuit-signal" d={path} pathLength={100}/></g>)}
+            </svg>
             <div className="agent-orbit orbit-one"/><div className="agent-orbit orbit-two"/>
             <div className="agent-beam"/><div className="agent-particles"><i/><i/><i/><i/><i/><i/></div>
             <Image className="agent-visual" src="/ai-companion.png" alt="AURA, Arun's AI portfolio assistant" width={900} height={600} priority/>
@@ -287,7 +291,7 @@ export default function Home(){
       <section className="contact" data-reveal><p className="label">05 / START A CONVERSATION</p><h2>Have an AI problem<br/>worth solving?</h2><a className="mail" href="mailto:arunkuttiyadan@gmail.com">arunkuttiyadan@gmail.com <Arrow/></a><div><a href="tel:+918086062055">+91 80860 62055</a><a href="https://www.linkedin.com/in/arun-kuttiyadan/" target="_blank" rel="noreferrer">LINKEDIN <Arrow/></a><a href="https://github.com/arunkuttiyadan" target="_blank" rel="noreferrer">GITHUB <Arrow/></a></div></section>
     </main>
     <footer><p>ARUN K / AI LAB</p><p>DESIGNED & ENGINEERED WITH INTENT</p><p>© 2026</p></footer>
-    <div className={`ai-companion ${chatOpen ? "is-open" : ""}`} ref={companionRef}>
+    <div className={`ai-companion ${chatOpen ? "is-open" : ""}`} ref={companionRef} data-motion={motionPaused ? "paused" : "active"}>
       {!chatOpen && <span className="companion-callout">ASK AURA <i>●</i></span>}
       {chatOpen && <section className="chat-panel" aria-label="Arun portfolio assistant">
         <div className="chat-head"><div><span><i/> AURA</span><small>{auraEndpoint ? "GEMINI · GENERAL + PORTFOLIO AI" : "GENERAL AI · ONLINE"}</small></div><button type="button" onClick={() => setChatOpen(false)} aria-label="Close chat">×</button></div>
@@ -305,7 +309,7 @@ function SectionHead({label,title,copy}:{label:string,title:string,copy:string})
 
 function SystemBlueprint({motionPaused,onToggleMotion}:{motionPaused:boolean;onToggleMotion:()=>void}){
   return <div className="system-blueprint">
-    <div className="blueprint-caption"><span>APPLIED AI / SYSTEM DESIGN</span><button className="motion-toggle" type="button" onClick={onToggleMotion} aria-label={motionPaused ? "Resume animations" : "Pause animations"} aria-pressed={motionPaused}><span aria-hidden="true">{motionPaused ? "▷" : "Ⅱ"}</span> {motionPaused ? "RESUME" : "PAUSE"}</button></div>
+    <div className="blueprint-caption"><span>APPLIED AI / SYSTEM DESIGN</span><MotionToggle motionPaused={motionPaused} onToggleMotion={onToggleMotion}/></div>
     <div className="blueprint-heading"><h2>Intelligence, with intention.</h2><p>From the right context to a useful outcome.</p></div>
     <div className="blueprint-diagram">
       <p className="blueprint-label">01 / CONTEXT</p>
@@ -317,4 +321,8 @@ function SystemBlueprint({motionPaused,onToggleMotion}:{motionPaused:boolean;onT
     </div>
     <div className="blueprint-footer"><span>CONTEXT FIRST.</span><span>QUALITY THROUGHOUT.</span></div>
   </div>;
+}
+
+function MotionToggle({motionPaused,onToggleMotion,className=""}:{motionPaused:boolean;onToggleMotion:()=>void;className?:string}){
+  return <button className={`motion-toggle ${className}`} type="button" onClick={onToggleMotion} aria-label={motionPaused ? "Resume animations" : "Pause animations"} aria-pressed={motionPaused}><span aria-hidden="true">{motionPaused ? "▷" : "Ⅱ"}</span> {motionPaused ? "RESUME" : "PAUSE"}</button>;
 }
