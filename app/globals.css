@@ -383,7 +383,7 @@ html[data-theme="light"] :is([data-motion="paused"],.hero[data-in-view="false"])
   html[data-theme="light"] .motion-toggle{display:none}
   html[data-theme="light"] :is(.hero-word,.system-blueprint,.ai-card,.facts p){animation:none!important;transform:none!important;translate:none!important}
 }
-@keyframes word-enter{from{opacity:0;transform:translateY(24px);clip-path:inset(0 0 100% 0)}to{opacity:1;transform:translateY(0);clip-path:inset(0)}}
+@keyframes word-enter{0%{opacity:0;transform:translateY(32px) scale(.88)}65%{opacity:1;transform:translateY(-3px) scale(1.025)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes motion-enter{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes card-reveal{from{opacity:0;translate:0 28px}to{opacity:1;translate:0 0}}
 @keyframes blueprint-drift{0%,100%{translate:0 0}50%{translate:0 -9px}}
@@ -462,3 +462,37 @@ html[data-theme="dark"] .hero[data-in-view="false"]:before{animation-play-state:
 @keyframes dark-module-cycle{0%,38%,100%{translate:0 0;border-color:#ffffff20;box-shadow:0 18px 40px #0008,inset 0 1px #ffffff0c}10%,22%{translate:0 -6px;border-color:#ffad7080;box-shadow:0 18px 40px #0008,0 0 24px #ff81381c}}
 @keyframes dark-circuit-flow{0%{stroke-dashoffset:10;opacity:0}6%{opacity:1}26%{stroke-dashoffset:-100;opacity:1}32%,100%{stroke-dashoffset:-100;opacity:0}}
 @keyframes dark-ring-breathe{0%,100%{scale:1;opacity:.45}50%{scale:1.08;opacity:1}}
+
+/* The headline lands once, then each word takes a turn in the spotlight. */
+html[data-theme] .hero-word{--word-rest:var(--text);--word-active:var(--orange);--word-delay:1.1s;transform-origin:left center}
+html[data-theme] .hero-word:nth-of-type(2){--word-delay:1.95s}
+html[data-theme] h1 em.hero-word{--word-rest:var(--orange);--word-delay:2.8s}
+html[data-theme="dark"] .hero-word{--word-active:#ffc18f;--word-glow:#ff813856}
+html[data-theme="dark"] h1 em.hero-word{--word-active:#ffe2bd}
+html[data-theme="light"] .hero-word{--word-active:#476c83;--word-glow:#4d62701a}
+html[data-theme="light"] h1 em.hero-word{--word-active:#263f50}
+html[data-theme] .hero-word-ink{position:relative;display:inline-block;transform-origin:left center}
+@media(prefers-reduced-motion:no-preference){
+  html[data-theme] .hero-word-ink{animation:headline-pop 6.5s var(--word-delay) cubic-bezier(.22,1,.36,1) infinite}
+  html[data-theme] .hero-word-ink:after{content:"";position:absolute;left:.025em;right:.08em;bottom:-.025em;height:.018em;min-height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;opacity:0;animation:headline-underline 6.5s var(--word-delay) ease-in-out infinite}
+}
+html[data-theme] :is([data-motion="paused"],.hero[data-in-view="false"]) .hero-word-ink,
+html[data-theme] :is([data-motion="paused"],.hero[data-in-view="false"]) .hero-word-ink:after{animation-play-state:paused!important}
+@media(max-width:850px){
+  html[data-theme="dark"] :is(.hero-word,.hero-word-ink){transform-origin:center}
+}
+@media(prefers-reduced-motion:reduce){
+  html[data-theme] .hero-word-ink{animation:none!important;transform:none!important}
+  html[data-theme] .hero-word-ink:after{display:none}
+}
+@keyframes headline-pop{
+  0%,25%,100%{transform:translateY(0) scale(1);color:var(--word-rest);text-shadow:0 0 0 transparent}
+  6%{transform:translateY(-.045em) scale(1.035);color:var(--word-active);text-shadow:0 .015em .22em var(--word-glow)}
+  12%{transform:translateY(.008em) scale(.997);color:var(--word-active);text-shadow:0 0 .12em var(--word-glow)}
+  19%{transform:translateY(0) scale(1);color:var(--word-rest);text-shadow:0 0 0 transparent}
+}
+@keyframes headline-underline{
+  0%,22%,100%{transform:scaleX(0);opacity:0}
+  7%,12%{transform:scaleX(1);opacity:.65}
+  19%{transform:scaleX(1);opacity:0}
+}
