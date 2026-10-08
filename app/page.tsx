@@ -249,10 +249,9 @@ export default function Home(){
         <div className="scan" aria-hidden="true"/>
         <div className="hero-meta"><span>AUTONOMOUS INTELLIGENCE <i/></span><span>INDIA · IST · {time}</span><span>AI ENGINEER / PRODUCT BUILDER</span></div>
         <div className="hero-grid">
-          <div className="hero-copy"><p className="prompt">AI ENGINEER · LLM SYSTEMS · RAG</p><h1><span className="hero-word"><span className="hero-word-ink">RETRIEVE.</span></span><br/><span className="hero-word"><span className="hero-word-ink">REASON.</span></span><br/><em className="hero-word"><span className="hero-word-ink">SHIP.</span></em></h1><p className="lede">I build grounded AI systems that understand context, connect to useful tools, and turn model intelligence into dependable products.</p><div className="hero-actions"><a href="#work">EXPLORE MY SYSTEMS <Arrow/></a><a href="/Arun-K-Resume.pdf" download>GET MY RÉSUMÉ ↓</a></div></div>
+          <div className="hero-copy"><p className="prompt">AI ENGINEER · LLM SYSTEMS · RAG</p><h1><span className="hero-word"><span className="hero-word-ink">RETRIEVE.</span></span><span className="hero-word"><span className="hero-word-ink">REASON.</span></span><em className="hero-word"><span className="hero-word-ink">SHIP.</span></em></h1><p className="lede">I build grounded AI systems that understand context, connect to useful tools, and turn model intelligence into dependable products.</p><div className="hero-actions"><a href="#work">EXPLORE MY SYSTEMS <Arrow/></a><a href="/Arun-K-Resume.pdf" download>GET MY RÉSUMÉ ↓</a></div></div>
           <aside className="agent-stage" aria-label="Arun's AI engineering capabilities" onPointerMove={onCardMove} onPointerLeave={resetCard}>
-            <SystemBlueprint motionPaused={motionPaused} onToggleMotion={() => setMotionPaused(paused => !paused)}/>
-            <MotionToggle className="dark-motion-toggle" motionPaused={motionPaused} onToggleMotion={() => setMotionPaused(paused => !paused)}/>
+            <MotionToggle className="scene-motion-toggle" motionPaused={motionPaused} onToggleMotion={() => setMotionPaused(paused => !paused)}/>
             <svg className="agent-circuit" viewBox="0 0 600 570" preserveAspectRatio="none" aria-hidden="true">
               {["M150 142H216V230H270", "M475 188H390V250H330", "M130 410H212V328H270", "M480 446H390V340H330"].map((path,index) => <g key={path} style={{ animationDelay:`${index * 1.75}s` }}><path className="circuit-track" d={path}/><path className="circuit-signal" d={path} pathLength={100}/></g>)}
             </svg>
@@ -306,22 +305,6 @@ export default function Home(){
 }
 
 function SectionHead({label,title,copy}:{label:string,title:string,copy:string}){ return <div className="section-head" data-depth><div><p className="label">{label}</p><h2>{title}</h2></div><p>{copy}</p></div>; }
-
-function SystemBlueprint({motionPaused,onToggleMotion}:{motionPaused:boolean;onToggleMotion:()=>void}){
-  return <div className="system-blueprint">
-    <div className="blueprint-caption"><span>APPLIED AI / SYSTEM DESIGN</span><MotionToggle motionPaused={motionPaused} onToggleMotion={onToggleMotion}/></div>
-    <div className="blueprint-heading"><h2>Intelligence, with intention.</h2><p>From the right context to a useful outcome.</p></div>
-    <div className="blueprint-diagram">
-      <p className="blueprint-label">01 / CONTEXT</p>
-      <div className="blueprint-inputs"><span>Documents</span><span>Knowledge</span><span>Tools & APIs</span></div>
-      <div className="blueprint-connector" aria-hidden="true"><i/><i/><i/></div>
-      <div className="blueprint-core"><span className="blueprint-symbol" aria-hidden="true">◇</span><div><span>02 / INTELLIGENCE</span><h3>Retrieve. Reason. Evaluate.</h3><p>Grounded in context. Designed for trust.</p></div></div>
-      <div className="blueprint-branch" aria-hidden="true"><i/><i/></div>
-      <div className="blueprint-outputs"><div><span>03 / OVERSIGHT</span><p>Human review</p></div><div><span>04 / OUTCOME</span><p>Dependable products</p></div></div>
-    </div>
-    <div className="blueprint-footer"><span>CONTEXT FIRST.</span><span>QUALITY THROUGHOUT.</span></div>
-  </div>;
-}
 
 function MotionToggle({motionPaused,onToggleMotion,className=""}:{motionPaused:boolean;onToggleMotion:()=>void;className?:string}){
   return <button className={`motion-toggle ${className}`} type="button" onClick={onToggleMotion} aria-label={motionPaused ? "Resume animations" : "Pause animations"} aria-pressed={motionPaused}><span aria-hidden="true">{motionPaused ? "▷" : "Ⅱ"}</span> {motionPaused ? "RESUME" : "PAUSE"}</button>;
