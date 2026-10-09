@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import HeroCharacter from "./HeroCharacter";
 
 const aiProjects = [
   { id:"04", status:"SHIPPED", category:"LOCAL AI", title:"Smart Resume Screener", kind:"LOCAL AI · RESPONSIBLE ML", description:"A privacy-first screening workspace that compares resumes with a job description, then surfaces ranked evidence and gaps for human review. Local Ollama inference adds structured fit analysis alongside an explainable deterministic score.", stack:["Ollama","Gemma 3","PDF.js","Node.js","SQLite","Structured output"], link:"https://github.com/arunkuttiyadan/Smart-resume-screener", note:"Resume text stays local by default. No cloud API or account required." },
@@ -69,8 +70,6 @@ export default function Home(){
   const [feedbackPrepared, setFeedbackPrepared] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [motionPaused, setMotionPaused] = useState(false);
-  const [characterReady, setCharacterReady] = useState(false);
-  const [bowReady, setBowReady] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
   const companionRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -278,13 +277,7 @@ export default function Home(){
             </svg>
             <div className="agent-orbit orbit-one"/><div className="agent-orbit orbit-two"/>
             <div className="agent-beam"/><div className="agent-particles"><i/><i/><i/><i/><i/><i/></div>
-            <div className={`agent-visual hero-character ${characterReady && bowReady ? "is-ready" : ""}`} role="img" aria-label="Animated 3D cartoon portrait of Arun wearing his straw hat and glasses">
-              <div className="character-standing">
-              <Image className="character-part character-legs" src="/generated/arun-character-cartoon.png" alt="" aria-hidden="true" width={1024} height={1536} onLoad={() => setCharacterReady(true)} priority/>
-              <div className="character-upper">{["body", "head"].map(part => <Image key={part} className={`character-part character-${part}`} src="/generated/arun-character-cartoon.png" alt="" aria-hidden="true" width={1024} height={1536} priority/>)}</div>
-              </div>
-              <Image className="character-bow-pose" src="/generated/arun-character-bow.png" alt="" aria-hidden="true" width={1024} height={1536} onLoad={() => setBowReady(true)} priority/>
-            </div>
+            <HeroCharacter paused={motionPaused}/>
             <div className="agent-module module-memory"><span>▦</span><p><b>MEMORY</b>Vector retrieval</p></div>
             <div className="agent-module module-reason"><span>◉</span><p><b>REASONING</b>Context online</p></div>
             <div className="agent-module module-tools"><span>⌘</span><p><b>TOOLS</b>Full stack</p></div>

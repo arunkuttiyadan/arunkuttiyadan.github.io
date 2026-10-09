@@ -469,63 +469,17 @@ html[data-theme] [data-motion="paused"] .hero-word-ink{animation:none!important;
   html[data-theme] [data-arrive] {opacity:1;translate:none;transform:none}
 }
 
-/* Independently eased portrait layers keep the feet planted while the person breathes. */
-html[data-theme] .hero-character{width:306.67px;height:460px;max-width:68%;align-self:center;transform-origin:50% 98%;transform:none;translate:none;rotate:0deg;animation:none}
-.character-part{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
-.character-legs{mask-image:linear-gradient(to bottom,transparent 57%,#000 61%)}
-.character-body{mask-image:linear-gradient(to bottom,transparent 24%,#000 28%,#000 57%,transparent 61%);transform-origin:50% 60%}
-.character-head{mask-image:linear-gradient(to bottom,#000 24%,transparent 28%);transform-origin:51% 27%}
-@media(prefers-reduced-motion:no-preference){
-  html[data-theme] .hero-character{animation:character-weight-shift 12s ease-in-out infinite}
-  .character-body{animation:character-breathe 4.8s ease-in-out infinite}
-  .character-head{animation:character-head-rest 11s ease-in-out infinite}
-}
-@keyframes character-weight-shift{
-  0%,100%{rotate:-.35deg}
-  28%{rotate:.55deg}
-  62%{rotate:.15deg}
-  82%{rotate:-.5deg}
-}
-@keyframes character-breathe{
-  0%,100%{transform:scale(1,1)}
-  45%{transform:scale(1.012,1.008)}
-}
-@keyframes character-head-rest{
-  0%,100%{transform:translateY(0) rotate(0deg)}
-  24%{transform:translateY(-.7px) rotate(1.2deg)}
-  42%{transform:translateY(.5px) rotate(.3deg)}
-  48%{transform:translateY(1px) rotate(-.5deg)}
-  58%{transform:translateY(0) rotate(.2deg)}
-  78%{transform:translateY(-.5px) rotate(-1deg)}
-}
-html[data-theme] :is([data-motion="paused"],.hero[data-in-view="false"]) .character-part{animation-play-state:paused!important}
-@media(prefers-reduced-motion:reduce){.character-part{animation:none!important;transform:none!important}}
-@media(max-width:850px){html[data-theme] .hero-character{width:280px;height:420px;max-width:62%}}
-@media(max-width:520px){html[data-theme] .hero-character{width:206.67px;height:310px;max-width:64%}}
-
 /* A shared floor anchors the portrait, spotlight, and concentric platform. */
 html[data-theme] .agent-stage{--character-height:400px;--stage-floor:15.5%}
 html[data-theme] .hero-character{position:absolute;left:50%;bottom:calc(var(--stage-floor) - var(--character-height) * .01);width:calc(var(--character-height) * 2 / 3);height:var(--character-height);max-width:none;margin-left:calc(var(--character-height) * -.298);transform-origin:45% 99%}
 html[data-theme] .agent-platform{top:calc(100% - var(--stage-floor));bottom:auto;transform:translate(-50%,-50%) rotateX(66deg);translate:none}
 html[data-theme] .agent-beam{left:15%;top:0;bottom:var(--stage-floor);width:70%;height:auto;clip-path:polygon(47% 0,53% 0,100% 100%,0 100%)}
-.character-upper{position:absolute;inset:0;transform-origin:50% 59%;}
 @media(max-width:850px){html[data-theme] .agent-stage{--character-height:365px}}
 @media(max-width:520px){html[data-theme] .agent-stage{--character-height:270px;--stage-floor:13.5%}}
 
-/* A real bowed pose replaces the old flat-image tilt. */
-.character-standing{position:absolute;inset:0;transform-origin:45% 99%}
-.character-bow-pose{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transform:translateX(-3.5%) scale(.88);transform-origin:45% 99%;pointer-events:none}
-@media(prefers-reduced-motion:no-preference){
-  .hero-character.is-ready .character-standing{animation:standing-greeting 6s 1.1s ease-in-out both}
-  .hero-character.is-ready .character-bow-pose{animation:bow-greeting 6s 1.1s ease-in-out both}
-}
-@keyframes standing-greeting{
-  0%,10%,90%,100%{opacity:1;transform:scaleY(1)}
-  30%,70%{opacity:0;transform:scaleY(.94)}
-}
-@keyframes bow-greeting{
-  0%,10%,90%,100%{opacity:0;transform:translateX(-3.5%) scale(.92)}
-  30%,70%{opacity:1;transform:translateX(-3.5%) scale(.88)}
-}
-html[data-theme] :is([data-motion="paused"],.hero[data-in-view="false"]) :is(.character-standing,.character-bow-pose){animation-play-state:paused!important}
-@media(prefers-reduced-motion:reduce){.character-standing{animation:none!important;opacity:1;transform:none}.character-bow-pose{display:none}}
+/* One continuously deformed portrait, with a static loading fallback. */
+html[data-theme] .hero-character{transform:none;translate:none;rotate:none;animation:none}
+.character-canvas,.character-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.character-canvas{visibility:hidden}
+.hero-character[data-rendered="true"] .character-canvas{visibility:visible}
+.hero-character[data-rendered="true"] .character-fallback{visibility:hidden}
