@@ -468,3 +468,8 @@ html[data-theme] [data-motion="paused"] .hero-word-ink{animation:none!important;
 @media (prefers-reduced-motion:reduce) {
   html[data-theme] [data-arrive] {opacity:1;translate:none;transform:none}
 }
+
+/* Keep the portrait framed within the shared orbital scene. */
+html[data-theme] .hero-character{width:auto;height:460px;max-width:68%;object-fit:contain;align-self:center}
+@media(max-width:850px){html[data-theme] .hero-character{height:420px;max-width:62%}}
+@media(max-width:520px){html[data-theme] .hero-character{height:310px;max-width:64%}}

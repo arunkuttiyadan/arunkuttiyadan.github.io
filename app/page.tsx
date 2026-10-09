@@ -276,7 +276,7 @@ export default function Home(){
             </svg>
             <div className="agent-orbit orbit-one"/><div className="agent-orbit orbit-two"/>
             <div className="agent-beam"/><div className="agent-particles"><i/><i/><i/><i/><i/><i/></div>
-            <Image className="agent-visual" src="/ai-companion.png" alt="AURA, Arun's AI portfolio assistant" width={900} height={600} priority/>
+            <Image className="agent-visual hero-character" src="/generated/arun-character.png" alt="3D cartoon portrait of Arun wearing his straw hat and glasses" width={1024} height={1536} priority/>
             <div className="agent-module module-memory"><span>▦</span><p><b>MEMORY</b>Vector retrieval</p></div>
             <div className="agent-module module-reason"><span>◉</span><p><b>REASONING</b>Context online</p></div>
             <div className="agent-module module-tools"><span>⌘</span><p><b>TOOLS</b>Full stack</p></div>
