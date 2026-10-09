@@ -278,8 +278,9 @@ export default function Home(){
             <div className="agent-orbit orbit-one"/><div className="agent-orbit orbit-two"/>
             <div className="agent-beam"/><div className="agent-particles"><i/><i/><i/><i/><i/><i/></div>
             <div className={`agent-visual hero-character ${characterReady ? "is-ready" : ""}`} role="img" aria-label="Animated 3D cartoon portrait of Arun wearing his straw hat and glasses">
-              {["legs", "body", "head"].map(part => <Image key={part} className={`character-part character-${part}`} src="/generated/arun-character-cartoon.png" alt="" aria-hidden="true" width={1024} height={1536} onLoad={() => setCharacterReady(true)} priority/>)}
-              <span className="character-greeting" aria-hidden="true">Hi, I’m Arun! <span>Welcome to my space.</span></span>
+              <Image className="character-part character-legs" src="/generated/arun-character-cartoon.png" alt="" aria-hidden="true" width={1024} height={1536} onLoad={() => setCharacterReady(true)} priority/>
+              <div className="character-upper">{["body", "head"].map(part => <Image key={part} className={`character-part character-${part}`} src="/generated/arun-character-cartoon.png" alt="" aria-hidden="true" width={1024} height={1536} priority/>)}</div>
+              <span className="character-greeting" aria-hidden="true"><span lang="ja" className="greeting-japanese">こんにちは</span><span>I’m Arun. Welcome!</span></span>
             </div>
             <div className="agent-module module-memory"><span>▦</span><p><b>MEMORY</b>Vector retrieval</p></div>
             <div className="agent-module module-reason"><span>◉</span><p><b>REASONING</b>Context online</p></div>
