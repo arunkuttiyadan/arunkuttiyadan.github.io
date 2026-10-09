@@ -452,7 +452,7 @@ html[data-theme] [data-motion="paused"] .hero-word-ink{animation:none!important;
   }
   html[data-theme] [data-arrive].has-arrived {opacity:1;translate:0 0}
   html[data-theme] :is(.section-head,.intro-strip p,.feedback-copy) {transition:transform .65s cubic-bezier(.22,1,.36,1)}
-  html[data-theme] .agent-visual {translate:var(--scene-x,0px) var(--scene-y,0px);transition:translate 1.2s cubic-bezier(.22,1,.36,1),transform .65s ease}
+  html[data-theme] .agent-visual {transform:translate(var(--scene-x,0px),var(--scene-y,0px)) perspective(1000px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));transition:transform 1.2s cubic-bezier(.22,1,.36,1)}
   html[data-theme] .agent-module {translate:calc(var(--scene-x,0px) * -.6) calc(var(--scene-y,0px) * -.6);transition:translate 1.5s cubic-bezier(.22,1,.36,1),background-color .38s ease}
   html[data-theme] .agent-platform {translate:calc(var(--scene-x,0px) * .3) 0;transition:translate 1.6s ease}
   html[data-theme] :is(.hero-actions a,.filter-row button,.feedback-submit button,.mail) {transition:transform .45s cubic-bezier(.22,1,.36,1),background .35s ease,box-shadow .35s ease,color .35s ease}
@@ -461,6 +461,7 @@ html[data-theme] [data-motion="paused"] .hero-word-ink{animation:none!important;
   html[data-theme] .contact:before {animation:contact-orbit 20s ease-in-out infinite}
   html[data-theme] [data-motion="paused"] .contact:before {animation-play-state:paused}
   html[data-theme] [data-motion="paused"] :is(.agent-visual,.agent-module,.agent-platform) {translate:none}
+  html[data-theme] [data-motion="paused"] .agent-visual {transform:none}
   html[data-theme] [data-motion="paused"] [data-arrive] {opacity:1;translate:none;transition:none}
 }
 @keyframes contact-orbit {50% {transform:translate(-5%,8%) scale(1.12)}}
