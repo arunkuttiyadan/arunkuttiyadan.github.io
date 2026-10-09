@@ -469,7 +469,36 @@ html[data-theme] [data-motion="paused"] .hero-word-ink{animation:none!important;
   html[data-theme] [data-arrive] {opacity:1;translate:none;transform:none}
 }
 
-/* Keep the portrait framed within the shared orbital scene. */
-html[data-theme] .hero-character{width:auto;height:460px;max-width:68%;object-fit:contain;align-self:center}
-@media(max-width:850px){html[data-theme] .hero-character{height:420px;max-width:62%}}
-@media(max-width:520px){html[data-theme] .hero-character{height:310px;max-width:64%}}
+/* Independently eased portrait layers keep the feet planted while the person breathes. */
+html[data-theme] .hero-character{width:306.67px;height:460px;max-width:68%;align-self:center;transform-origin:50% 98%;transform:none;translate:none;rotate:0deg;animation:none}
+.character-part{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.character-legs{mask-image:linear-gradient(to bottom,transparent 57%,#000 61%)}
+.character-body{mask-image:linear-gradient(to bottom,transparent 22%,#000 26%,#000 57%,transparent 61%);transform-origin:50% 60%}
+.character-head{mask-image:linear-gradient(to bottom,#000 22%,transparent 26%);transform-origin:51% 25%}
+@media(prefers-reduced-motion:no-preference){
+  html[data-theme] .hero-character{animation:character-weight-shift 12s ease-in-out infinite}
+  .character-body{animation:character-breathe 4.8s ease-in-out infinite}
+  .character-head{animation:character-head-rest 11s ease-in-out infinite}
+}
+@keyframes character-weight-shift{
+  0%,100%{rotate:-.35deg}
+  28%{rotate:.55deg}
+  62%{rotate:.15deg}
+  82%{rotate:-.5deg}
+}
+@keyframes character-breathe{
+  0%,100%{transform:scale(1,1)}
+  45%{transform:scale(1.012,1.008)}
+}
+@keyframes character-head-rest{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  24%{transform:translateY(-.7px) rotate(1.2deg)}
+  42%{transform:translateY(.5px) rotate(.3deg)}
+  48%{transform:translateY(1px) rotate(-.5deg)}
+  58%{transform:translateY(0) rotate(.2deg)}
+  78%{transform:translateY(-.5px) rotate(-1deg)}
+}
+html[data-theme] :is([data-motion="paused"],.hero[data-in-view="false"]) .character-part{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){.character-part{animation:none!important;transform:none!important}}
+@media(max-width:850px){html[data-theme] .hero-character{width:280px;height:420px;max-width:62%}}
+@media(max-width:520px){html[data-theme] .hero-character{width:206.67px;height:310px;max-width:64%}}
