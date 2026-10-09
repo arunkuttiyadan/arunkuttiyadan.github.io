@@ -153,16 +153,35 @@ export default function Home(){
     };
   }, []);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("has-arrived");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: .08, rootMargin: "0px 0px -24px 0px" });
+    document.querySelectorAll<HTMLElement>(".ai-card, .stack-list p, .secondary-work article, .facts p, .feedback-card").forEach((element, index) => {
+      element.dataset.arrive = "";
+      element.style.setProperty("--arrival-delay", `${(index % 2) * 90}ms`);
+      observer.observe(element);
+    });
+    return () => observer.disconnect();
+  }, [projectFilter]);
+
   useEffect(() => { if (chatOpen) chatEndRef.current?.scrollIntoView({ behavior:"smooth" }); }, [chatMessages, chatOpen, chatThinking]);
 
   const onHeroMove = (event: React.MouseEvent<HTMLElement>) => {
+    if (motionPaused || window.matchMedia("(prefers-reduced-motion: reduce), (pointer: coarse)").matches) return;
     const bounds = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty("--scene-x", `${((event.clientX - bounds.left) / bounds.width - .5) * 18}px`);
+    event.currentTarget.style.setProperty("--scene-y", `${((event.clientY - bounds.top) / bounds.height - .5) * 12}px`);
     event.currentTarget.style.setProperty("--mx", `${event.clientX - bounds.left}px`);
     event.currentTarget.style.setProperty("--my", `${event.clientY - bounds.top}px`);
   };
 
   const onCardMove = (event: React.PointerEvent<HTMLElement>) => {
-    if (event.pointerType === "touch") return;
+    if (event.pointerType === "touch" || motionPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = (event.clientX - bounds.left) / bounds.width - .5;
     const y = (event.clientY - bounds.top) / bounds.height - .5;
@@ -245,7 +264,7 @@ export default function Home(){
       <div className="header-actions"><button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`} aria-pressed={theme === "light"}><span className="theme-icon" aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span><span className="theme-label">{theme === "dark" ? "LIGHT" : "DARK"}</span></button><button className="command-trigger" type="button" onClick={() => setCommandOpen(true)} aria-label="Open command menu">⌘ K</button><a className="availability" href="mailto:arunkuttiyadan@gmail.com"><i/> MEET ARUN</a></div>
     </header>
     <main id="main" data-motion={motionPaused ? "paused" : "active"}>
-      <section className="hero" id="top" ref={heroRef} onMouseMove={onHeroMove}>
+      <section className="hero" id="top" ref={heroRef} onMouseMove={onHeroMove} onMouseLeave={event => { event.currentTarget.style.setProperty("--scene-x", "0px"); event.currentTarget.style.setProperty("--scene-y", "0px"); }}>
         <div className="scan" aria-hidden="true"/>
         <div className="hero-meta"><span>AUTONOMOUS INTELLIGENCE <i/></span><span>INDIA · IST · {time}</span><span>AI ENGINEER / PRODUCT BUILDER</span></div>
         <div className="hero-grid">
