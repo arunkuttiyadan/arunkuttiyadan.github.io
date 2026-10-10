@@ -477,9 +477,6 @@ html[data-theme] .agent-beam{left:15%;top:0;bottom:var(--stage-floor);width:70%;
 @media(max-width:850px){html[data-theme] .agent-stage{--character-height:365px}}
 @media(max-width:520px){html[data-theme] .agent-stage{--character-height:270px;--stage-floor:13.5%}}
 
-/* One continuously deformed portrait, with a static loading fallback. */
+/* Static portrait stays centered on the shared platform. */
 html[data-theme] .hero-character{transform:none;translate:none;rotate:none;animation:none}
-.character-canvas,.character-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
-.character-canvas{visibility:hidden}
-.hero-character[data-rendered="true"] .character-canvas{visibility:visible}
-.hero-character[data-rendered="true"] .character-fallback{visibility:hidden}
+.character-portrait{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}

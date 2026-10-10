@@ -277,7 +277,7 @@ export default function Home(){
             </svg>
             <div className="agent-orbit orbit-one"/><div className="agent-orbit orbit-two"/>
             <div className="agent-beam"/><div className="agent-particles"><i/><i/><i/><i/><i/><i/></div>
-            <HeroCharacter paused={motionPaused}/>
+            <HeroCharacter/>
             <div className="agent-module module-memory"><span>▦</span><p><b>MEMORY</b>Vector retrieval</p></div>
             <div className="agent-module module-reason"><span>◉</span><p><b>REASONING</b>Context online</p></div>
             <div className="agent-module module-tools"><span>⌘</span><p><b>TOOLS</b>Full stack</p></div>
