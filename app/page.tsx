@@ -58,6 +58,7 @@ function portfolioAnswer(question: string){
 function Arrow(){ return <span aria-hidden="true">↗</span>; }
 
 export default function Home(){
+  const [loading, setLoading] = useState(true);
   const [projectFilter, setProjectFilter] = useState("ALL");
   const [commandOpen, setCommandOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState("");
@@ -74,6 +75,24 @@ export default function Home(){
   const companionRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const feedbackFormRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    const fallback = window.setTimeout(() => active && setLoading(false), 4500);
+    const finish = () => {
+      if (!active) return;
+      window.clearTimeout(fallback);
+      setLoading(false);
+    };
+    const portrait = document.querySelector<HTMLImageElement>(".character-portrait");
+    const portraitReady = portrait?.complete ? Promise.resolve() : new Promise<void>(resolve => {
+      if (!portrait) return resolve();
+      portrait.addEventListener("load", () => resolve(), { once:true });
+      portrait.addEventListener("error", () => resolve(), { once:true });
+    });
+    Promise.all([document.fonts?.ready ?? Promise.resolve(), portraitReady]).then(() => window.setTimeout(finish, 250));
+    return () => { active = false; window.clearTimeout(fallback); };
+  }, []);
 
   const visibleProjects = useMemo(() => projectFilter === "ALL" ? aiProjects : aiProjects.filter(project => project.category === projectFilter), [projectFilter]);
   const visibleCommands = useMemo(() => commands.filter(command => normalizeSearch(`${command.label} ${command.hint}`).includes(normalizeSearch(commandQuery))), [commandQuery]);
@@ -256,6 +275,7 @@ export default function Home(){
   };
 
   return <>
+    {loading && <div className="site-loader" role="status" aria-live="polite"><div className="site-loader-mark">AK</div><p>PREPARING THE EXPERIENCE</p><div className="site-loader-track"><i/></div><span>RETRIEVE · REASON · SHIP</span></div>}
     <div className="scroll-progress" style={{ width:`${progress}%` }} aria-hidden="true" />
     <div className="scroll-scene" aria-hidden="true"><i/><i/><i/></div>
     <a className="skip" href="#main">Skip to content</a>
